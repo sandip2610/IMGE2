@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Home</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-image: url("{% static 'home.png' %}"); /* Add your background image URL */
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+        header {
+            background-color: rgba(76, 175, 80, 0.8); /* Transparent green */
+            color: white;
+            padding: 10px 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        header nav {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+        header nav a {
+            color: white;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: bold;
+            padding: 10px 20px;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+        header nav a:hover {
+            background-color: rgba(69, 160, 73, 0.8);
+        }
+        h1 {
+            color: #fff;
+            text-align: center;
+            margin-top: 40px;
+            text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.7);
+        }
+        p {
+            color: #f0f0f0;
+            text-align: center;
+            text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.7);
+        }
+        .form-container {
+            display: flex;
+            justify-content: center;
+            gap: 50px;
+            margin: 50px auto;
+            padding: 20px;
+            max-width: 800px;
+        }
+        .form-box {
+            background-color: rgba(255, 255, 255, 0.9);
+            border: 1px solid #ddd;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            width: 300px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            display: none; /* Hide forms by default */
+        }
+        .form-box.active {
+            display: block; /* Show only the active form */
+        }
+        h2 {
+            color: #444;
+            margin-bottom: 20px;
+        }
+        input {
+            display: block;
+            width: 95%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        button {
+            padding: 10px;
+            width: 100%;
+            border: none;
+            border-radius: 5px;
+            background-color: #4CAF50;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        p[style="color: red;"] {
+            margin: 10px auto;
+            color: #e74c3c;
+            font-weight: bold;
+        }
+        footer {
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            text-align: center;
+            padding: 10px 0;
+            position: relative;
+            bottom: 0;
+            width: 100%;
+            margin-top: 50px;
+        }
+        footer p {
+            margin: 0;
+            font-size: 14px;
+        }
+        footer a {
+            color: #4CAF50;
+            text-decoration: none;
+        }
+        footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+<header>
+    <nav>
+        <div style="display: flex; align-items: center; justify-content: space-between; width: 100%; padding: 0 20px;">
+            <!-- Logo Section -->
+            <div style="flex-shrink: 0;">
+                <a href="#">
+                    <img src="{% static 'droplogo.png' %}" alt="Logo" style="height: 40px;">
+                    <b>DropPhoto</b>
+                </a>
+            </div>
+
+            <!-- Navigation Links -->
+            <div style="display: flex; gap: 20px;">
+                <a href="#" id="signin-link">Sign In</a>
+                <a href="#" id="signup-link">Sign Up</a>
+            </div>
+        </div>
+    </nav>
+</header>
+
+    <h1>Welcome to DropPhoto</h1>
+    <p>Please sign up or sign in to continue.</p>
+
+    <div class="form-container">
+        <!-- Signup Form -->
+        <div class="form-box" id="signup-form">
+            <h2>Sign Up</h2>
+            <form method="POST">
+                {% csrf_token %}
+                {{ signup_form.as_p }}
+                <button type="submit" name="signup">Sign Up</button>
+            </form>
+        </div>
+
+        <!-- Signin Form -->
+        <div class="form-box" id="signin-form">
+            <h2>Sign In</h2>
+            <form method="POST">
+                {% csrf_token %}
+                {{ signin_form.as_p }}
+                <button type="submit" name="signin">Sign In</button>
+            </form>
+        </div>
+    </div>
+
+    {% for message in messages %}
+        <p style="color: red;">{{ message }}</p>
+    {% endfor %}
+        <!-- Image Row -->
+    <div style="display: flex; justify-content: space-around; flex-wrap: wrap; margin: 200px 10px;">
+        <div style="flex: 1 1 20%; margin: 5px; max-width: 250px; text-align: center;">
+            <img src="{% static 'photc1.png' %}" alt="Image 1" style="width: 100%; border-radius: 10px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+            <p style="color: #fff; margin-top: 10px;">BackGround Change</p>
+        </div>
+        <div style="flex: 1 1 20%; margin: 10px; max-width: 250px; text-align: center;">
+            <img src="{% static 'img_1.png' %}" alt="Image 2" style="width: 100%; border-radius: 10px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+            <p style="color: #fff; margin-top: 10px;">Image Resize</p>
+        </div>
+        <div style="flex: 1 1 20%; margin: 10px; max-width: 370px; text-align: center;">
+            <img src="{% static 'img_2.png' %}" alt="Image 3" style="width: 100%; border-radius: 10px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+            <p style="color: #fff; margin-top: 10px;">File Extantion change</p>
+        </div>
+        <div style="flex: 1 1 20%; margin: 10px; max-width: 290px; text-align: center;">
+            <img src="{% static 'img_3.png' %}" alt="Image 4" style="width: 100%; border-radius: 10px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+            <p style="color: #fff; margin-top: 10px;">CroppingImage</p>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2025 DropPhoto. All Rights Reserved. <a href="#"></a> | <a href="#"></a></p>
+    </footer>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const signinLink = document.getElementById("signin-link");
+            const signupLink = document.getElementById("signup-link");
+            const signinForm = document.getElementById("signin-form");
+            const signupForm = document.getElementById("signup-form");
+
+            signinLink.addEventListener("click", (e) => {
+                e.preventDefault();
+                signinForm.classList.add("active");
+                signupForm.classList.remove("active");
+            });
+
+            signupLink.addEventListener("click", (e) => {
+                e.preventDefault();
+                signupForm.classList.add("active");
+                signinForm.classList.remove("active");
+            });
+        });
+    </script>
+</body>
+</html>

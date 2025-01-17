@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Upload Success</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            padding: 20px;
+        }
+
+        canvas {
+            border: 1px solid #ccc;
+            margin-bottom: 20px;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        button, select, input {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: #4CAF50;
+            color: white;
+            cursor: pointer;
+        }
+
+        button:hover, select:hover, input:hover {
+            background-color: #45a049;
+        }
+
+        input[type="number"] {
+            width: 80px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Image Processed Successfully</h1>
+        <canvas id="image-canvas"></canvas>
+        <div class="controls">
+            <button id="rotate-btn">Rotate 90°</button>
+            <button id="erase-btn">Erase</button>
+            <button id="restore-btn">Restore</button>
+            <select id="format-select">
+                <option value="image/png">PNG</option>
+                <option value="image/jpeg">JPEG</option>
+                <option value="image/pdf">PDF</option>
+
+            </select>
+            <div>
+                <label for="width">Width:</label>
+                <input type="number" id="width" placeholder="Width" />
+            </div>
+            <div>
+                <label for="height">Height:</label>
+                <input type="number" id="height" placeholder="Height" />
+            </div>
+            <button id="resize-btn">Resize</button>
+            <button id="download-btn">Download</button>
+        </div>
+    </div>
+
+
+    <script>
+        const canvas = document.getElementById('image-canvas');
+        const ctx = canvas.getContext('2d');
+        const eraseBtn = document.getElementById('erase-btn');
+        const restoreBtn = document.getElementById('restore-btn');
+        const downloadBtn = document.getElementById('download-btn');
+        const rotateBtn = document.getElementById('rotate-btn');
+        const formatSelect = document.getElementById('format-select');
+        const widthInput = document.getElementById('width');
+        const heightInput = document.getElementById('height');
+        const resizeBtn = document.getElementById('resize-btn');
+
+        // Load the processed image into the canvas
+        const img = new Image();
+        img.src = "{{ image.processed_image.url }}"; // Django template tag for processed image URL
+        img.onload = () => {
+            canvas.width = img.width;
+            canvas.height = img.height;
+            ctx.drawImage(img, 0, 0);
+            originalImageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        };
+
+        // Store the original image for restore functionality
+        let originalImageData;
+        let currentRotation = 0; // Track rotation in degrees
+
+        // Resize functionality
+        resizeBtn.addEventListener('click', () => {
+            const newWidth = parseInt(widthInput.value);
+            const newHeight = parseInt(heightInput.value);
+
+            if (newWidth && newHeight) {
+                // Resize canvas to new dimensions
+                canvas.width = newWidth;
+                canvas.height = newHeight;
+                // Draw the image at the new size
+                ctx.drawImage(img, 0, 0, newWidth, newHeight);
+            }
+        });
+
+        // Erase functionality
+        let isErasing = false;
+        canvas.addEventListener('mousedown', () => (isErasing = true));
+        canvas.addEventListener('mouseup', () => (isErasing = false));
+        canvas.addEventListener('mousemove', (e) => {
+            if (isErasing) {
+                const rect = canvas.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                ctx.clearRect(x - 10, y - 10, 20, 20); // Erase a small area around the cursor
+            }
+        });
+
+        // Restore functionality
+        restoreBtn.addEventListener('click', () => {
+            if (originalImageData) {
+                canvas.width = originalImageData.width;
+                canvas.height = originalImageData.height;
+                ctx.putImageData(originalImageData, 0, 0);
+                currentRotation = 0; // Reset rotation
+            }
+        });
+
+        // Rotate functionality
+        rotateBtn.addEventListener('click', () => {
+            currentRotation = (currentRotation + 90) % 360;
+            const tempCanvas = document.createElement('canvas');
+            const tempCtx = tempCanvas.getContext('2d');
+
+            tempCanvas.width = canvas.height;
+            tempCanvas.height = canvas.width;
+
+            tempCtx.translate(tempCanvas.width / 2, tempCanvas.height / 2);
+            tempCtx.rotate((currentRotation * Math.PI) / 180);
+            tempCtx.drawImage(canvas, -canvas.width / 2, -canvas.height / 2);
+
+            canvas.width = tempCanvas.width;
+            canvas.height = tempCanvas.height;
+            ctx.drawImage(tempCanvas, 0, 0);
+        });
+
+        // Download functionality
+        downloadBtn.addEventListener('click', () => {
+            const format = formatSelect.value;
+            const link = document.createElement('a');
+            link.download = `edited_image.${format.split('/')[1]}`;
+            link.href = canvas.toDataURL(format);
+            link.click();
+        });
+    </script>
+</body>
+</html>
